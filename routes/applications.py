@@ -1,19 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
+from db.mongodb import db  # clean import
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
-# --- MongoDB connection setup ---
-MONGO_URI = os.getenv("MONGO_URI")
-if not MONGO_URI:
-    raise RuntimeError("Missing MONGO_URI environment variable")
-
-client = AsyncIOMotorClient(MONGO_URI)
-db = client["avrae"]  # change name if your database is different
-
-# --- Data model ---
 class Application(BaseModel):
     name: str
     email: str
@@ -23,7 +13,6 @@ class Application(BaseModel):
     reason: str
     socials: str
 
-# --- Routes ---
 @router.post("/submit")
 async def submit_application(data: Application):
     try:
