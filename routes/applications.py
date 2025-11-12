@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from db.mongodb import db  # clean import
+from db.mongo import applications
 
-router = APIRouter(prefix="/applications", tags=["Applications"])
+router = APIRouter()
 
 class Application(BaseModel):
     name: str
@@ -16,7 +16,7 @@ class Application(BaseModel):
 @router.post("/submit")
 async def submit_application(data: Application):
     try:
-        await db["applications"].insert_one(data.dict())
+        await applications.insert_one(data.dict())
         return {"status": "success"}
     except Exception as e:
         print("Error saving application:", e)
