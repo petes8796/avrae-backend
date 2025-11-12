@@ -1,20 +1,27 @@
-from fastapi import APIRouter, BackgroundTasks
-from models.user import ApplicationIn
-from db.mongo import applications
-from utils.emailer import send_new_application_email
-from datetime import datetime
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from database import db
 
-router = APIRouter()
+router = APIRouter(prefix="/applications", tags=["Applications"])
+
+class Application(BaseModel):
+    name: str
+    email: str
+    occupation: str
+    country: str
+    networth: str
+    reason: str
+    socials: str
 
 @router.post("/submit")
-async def submit_application(payload: ApplicationIn, background_tasks: BackgroundTasks):
-    doc = payload.dict()
-    doc.update({
-        "payment_status": "unpaid",
-        "application_status": "pending",
-        "created_at": datetime.utcnow()
-    })
-    res = await applications.insert_one(doc)
-    app_id = str(res.inserted_id)
-    background_tasks.add_task(send_new_application_email, app_id, doc)
-    return {"id": app_id, "status": "created", "message": "Application received. Pending review."}
+async def submit_application(data: Application):
+    try:
+        await db["applications"].insert_one(data.dict())
+        return {"status": "success"}
+    except Exception as e:
+        print("Error saving application:", e)
+        raise HTTPException(status_code=500, detail="Database error")
+
+@router.get("/test")
+async def test_route():
+    return {"status": "ok"}
