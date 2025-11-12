@@ -2,6 +2,8 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from routes import applications
+app.include_router(applications.router, prefix="/applications", tags=["applications"])
 load_dotenv()
 
 app = FastAPI(title="Avrae Backend")
