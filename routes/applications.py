@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from database import db
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
