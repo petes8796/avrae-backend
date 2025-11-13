@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import applications  # adjust if you have different folder name
+from routes import applications
 
 app = FastAPI()
 
-# ✅ Allow your frontend domain
+# ✅ CORS FIX
 origins = [
-    "https://avrae-society.com",
-    "http://localhost:3000"
+    "https://avrae-society.com",  # your frontend domain
+    "http://localhost:3000",      # for local testing
 ]
 
 app.add_middleware(
@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ include your routes
+# ✅ Routers
 app.include_router(applications.router)
 
 @app.get("/")
