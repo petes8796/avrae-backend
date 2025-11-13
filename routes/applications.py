@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from db.mongo import db  # ✅ use global DB connection from mongo.py
+from db.mongo import applications_collection
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
-# --- Schema ---
 class Application(BaseModel):
     name: str
     email: str
@@ -14,22 +13,14 @@ class Application(BaseModel):
     reason: str
     socials: str
 
-
 @router.post("/submit")
 async def submit_application(data: Application):
     try:
-        # Insert into the "applications" collection in the "avrae" DB
-        result = await db["applications"].insert_one(data.dict())
-
-        if not result.inserted_id:
-            raise HTTPException(status_code=500, detail="Insert failed")
-
-        return {"status": "success", "message": "Application submitted successfully."}
-
+        result = await applications_collection.insert_one(data.dict())
+        return {"status": "success", "id": str(result.inserted_id)}
     except Exception as e:
         print("❌ Error saving application:", e)
-        raise HTTPException(status_code=500, detail="Database error")
-
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/test")
 async def test_route():
