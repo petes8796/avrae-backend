@@ -1,24 +1,29 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from db.mongo import db
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
+# --- Schema ---
 class Application(BaseModel):
     name: str
-    email: str
+    email: EmailStr
     occupation: str
     country: str
     networth: str
     reason: str
     socials: str
 
+# --- Routes ---
 @router.post("/submit")
 async def submit_application(data: Application):
-    # TEMPORARY: do not write to DB, just echo back — tests connectivity only
     try:
-        return {"status": "success", "received": data.dict()}
+        collection = db["applications"]
+        await collection.insert_one(data.dict())
+        return {"status": "success", "message": "Application submitted successfully"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Server error")
+        print("❌ MongoDB Error:", e)
+        raise HTTPException(status_code=500, detail="Database error")
 
 @router.get("/test")
 async def test_route():
