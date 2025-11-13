@@ -1,6 +1,8 @@
+# routes/applications.py
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from db.mongo import db
+import traceback
 
 router = APIRouter(prefix="/applications", tags=["Applications"])
 
@@ -19,9 +21,7 @@ async def submit_application(data: Application):
         result = await db["applications"].insert_one(data.dict())
         return {"status": "success", "id": str(result.inserted_id)}
     except Exception as e:
-        print("❌ Error saving application:", e)
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-
-@router.get("/test")
-async def test_route():
-    return {"status": "ok"}
+        tb = traceback.format_exc()
+        print("❌ Error saving application:\n", tb)   # will appear in Render logs
+        # return a generic error to client
+        raise HTTPException(status_code=500, detail="Server error (check backend logs)")
