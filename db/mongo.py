@@ -5,9 +5,9 @@ from motor.motor_asyncio import AsyncIOMotorClient
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
+
 if not MONGO_URI:
-    raise Exception("MONGO_URI not found. Please set it in Render environment variables.")
+    raise RuntimeError("Missing MONGO_URI environment variable")
 
 client = AsyncIOMotorClient(MONGO_URI)
-db = client["avrae"]  # your database name
-applications_collection = db.get_collection("applications")
+db = client["avrae"]  # Your database name
