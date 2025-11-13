@@ -1,11 +1,22 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes import applications
 
-app = FastAPI(title="Avrae Backend", version="1.0.0")
+app = FastAPI(title="Avrae Backend")
 
-# Register router
-app.include_router(applications.router, prefix="/applications", tags=["Applications"])
+# ✅ Allow frontend to access API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://avrae-society.com", "https://www.avrae-society.com", "*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# ✅ Include your applications route
+app.include_router(applications.router)
+
+# ✅ Simple health check
 @app.get("/")
-async def root():
+def home():
     return {"message": "Avrae Backend is Live"}
