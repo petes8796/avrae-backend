@@ -4,21 +4,15 @@ from routes import applications
 
 app = FastAPI()
 
-# ✅ CORS FIX
-origins = [
-    "https://avrae-society.com",  # your frontend domain
-    "http://localhost:3000",      # for local testing
-]
-
+# ✅ FULL CORS FIX
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # <-- temporarily allow all origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ Routers
 app.include_router(applications.router)
 
 @app.get("/")
