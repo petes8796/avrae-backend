@@ -1,27 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import sys
-import os
+from routes import applications  # adjust if you have different folder name
 
-# --- Ensure 'routes' folder is importable even on Render ---
-sys.path.append(os.path.join(os.path.dirname(__file__), "routes"))
+app = FastAPI()
 
-from routes import applications  # ✅ this must work
+# ✅ Allow your frontend domain
+origins = [
+    "https://avrae-society.com",
+    "http://localhost:3000"
+]
 
-app = FastAPI(title="Avrae Backend")
-
-# --- CORS setup ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://avrae-society.com", "https://www.avrae-society.com", "*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- Routes ---
+# ✅ include your routes
 app.include_router(applications.router)
 
 @app.get("/")
-def home():
+async def root():
     return {"message": "Avrae Backend is Live"}
