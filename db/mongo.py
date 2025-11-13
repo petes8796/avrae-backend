@@ -9,6 +9,10 @@ MONGO_URI = os.getenv("MONGO_URI")
 if not MONGO_URI:
     raise Exception("❌ MONGO_URI not found. Add it in Render Environment Variables.")
 
-client = AsyncIOMotorClient(MONGO_URI)
-db = client["avrae"]
-applications_collection = db["applications"]
+try:
+    client = AsyncIOMotorClient(MONGO_URI)
+    db = client.get_default_database()  # auto-uses "avrae"
+    print("✅ Connected to MongoDB successfully!")
+except Exception as e:
+    print("❌ MongoDB connection failed:", e)
+    raise
